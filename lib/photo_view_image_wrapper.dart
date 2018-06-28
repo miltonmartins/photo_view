@@ -11,8 +11,10 @@ class PhotoViewImageWrapper extends StatefulWidget{
     @required this.onStartPanning,
     @required this.imageInfo,
     @required this.scaleType,
+    this.isZooming
   }) : super(key:key);
 
+  final Function(bool isZooming) isZooming;
   final Function onDoubleTap;
   final Function onStartPanning;
   final ImageInfo imageInfo;
@@ -30,6 +32,7 @@ class _PhotoViewImageWrapperState extends State<PhotoViewImageWrapper> with Tick
   Offset _normalizedPosition;
   double _scale;
   double _scaleBefore;
+  double _scaleInitial;
 
   AnimationController _scaleAnimationController;
   Animation<double> _scaleAnimation;
@@ -50,6 +53,11 @@ class _PhotoViewImageWrapperState extends State<PhotoViewImageWrapper> with Tick
   }
 
   void onScaleStart(ScaleStartDetails details) {
+    if(_scaleInitial == null) {
+      _scaleInitial = scaleTypeAwareScale();
+      widget.isZooming != null? widget.isZooming(true) : null;
+    }
+
     _scaleBefore = scaleTypeAwareScale();
     _normalizedPosition= (details.focalPoint - _position);
     _scaleAnimationController.stop();
@@ -59,6 +67,14 @@ class _PhotoViewImageWrapperState extends State<PhotoViewImageWrapper> with Tick
   void onScaleUpdate(ScaleUpdateDetails details) {
     final double newScale = (_scaleBefore * details.scale);
     final Offset delta = (details.focalPoint - _normalizedPosition);
+
+    if(newScale <= _scaleInitial) {
+      widget.isZooming != null? widget.isZooming(false) : null;
+      return;
+    }
+
+    widget.isZooming != null? widget.isZooming(true) : null;
+
     if(details.scale != 1.0){
       widget.onStartPanning();
     }

@@ -11,11 +11,13 @@ import 'package:photo_view/photo_view_utils.dart';
 class PhotoView extends StatefulWidget{
   final ImageProvider imageProvider;
   final Widget loadingChild;
+  final Function(bool isZooming) isZooming;
 
   PhotoView({
     Key key,
     @required this.imageProvider,
-    this.loadingChild
+    this.loadingChild,
+    this.isZooming
   }) : super(key: key);
 
   @override
@@ -39,6 +41,7 @@ class _PhotoViewState extends State<PhotoView>{
 
   void onDoubleTap () {
     setState(() {
+      widget.isZooming != null? widget.isZooming(false) : null;
       _scaleType = nextScaleType(_scaleType);
     });
   }
@@ -63,6 +66,7 @@ class _PhotoViewState extends State<PhotoView>{
             return new PhotoViewImageWrapper(
               onDoubleTap: onDoubleTap,
               onStartPanning: onStartPanning,
+              isZooming: widget.isZooming,
               imageInfo: info.data,
               scaleType: _scaleType,
             );
