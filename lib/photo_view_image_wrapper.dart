@@ -65,15 +65,15 @@ class _PhotoViewImageWrapperState extends State<PhotoViewImageWrapper> with Tick
   }
 
   void onScaleUpdate(ScaleUpdateDetails details) {
-    final double newScale = (_scaleBefore * details.scale);
+    double newScale = (_scaleBefore * details.scale);
     final Offset delta = (details.focalPoint - _normalizedPosition);
 
-    if(newScale <= _scaleInitial) {
+    if(newScale <= _scaleInitial || newScale > _scaleInitial * 19.0) {
+      newScale = _scaleInitial;
       widget.isZooming != null? widget.isZooming(false) : null;
-      return;
+    } else {
+      widget.isZooming != null? widget.isZooming(true) : null;
     }
-
-    widget.isZooming != null? widget.isZooming(true) : null;
 
     if(details.scale != 1.0){
       widget.onStartPanning();
